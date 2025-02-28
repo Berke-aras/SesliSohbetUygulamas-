@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Discord Benzeri Uygulama</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+        <!-- Socket.IO ve WebRTC adapter -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+        <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    </head>
+    <body>
+        <!-- Üst Menü: Profil Düzenleme ve Çıkış -->
+        <div id="top-menu">
+            <a href="{{ url_for('profile') }}"
+                ><button>Profil Düzenle</button></a
+            >
+            <a href="{{ url_for('logout') }}"><button>Çıkış Yap</button></a>
+        </div>
+
+        <!-- Mesajlaşma Bölümü -->
+        <div id="chat-container">
+            <h2>Mesajlaşma</h2>
+            <div id="chat-window">
+                <ul id="messages">
+                    {% for msg in messages %}
+                    <li>
+                        {% if msg.profile_image_url %}
+                        <img
+                            src="{{ msg.profile_image_url }}"
+                            alt="Profil"
+                            width="30"
+                            height="30"
+                        />
+                        {% endif %}
+                        <strong>{{ msg.username }}:</strong> {{ msg.text }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div id="chat-input">
+                <input
+                    type="text"
+                    id="message"
+                    placeholder="Mesajınızı yazın"
+                />
+                <button id="send">Gönder</button>
+            </div>
+        </div>
+
+        <!-- Sesli Sohbet Bölümü -->
+        <div id="voice-container">
+            <h2>Sesli Sohbet</h2>
+            <button id="join-voice">Ses Kanalına Katıl</button>
+            <button id="leave-voice" style="display: none">
+                Ses Kanalından Çık
+            </button>
+            <div id="device-selection" style="display: none">
+                <label for="input-device">Mikrofon Seçin:</label>
+                <select id="input-device"></select>
+                <label for="output-device">Hoparlör Seçin:</label>
+                <select id="output-device"></select>
+            </div>
+            <div id="voice-status"></div>
+            <h3>Ses Kanalı Üyeleri:</h3>
+            <ul id="voice-users"></ul>
+        </div>
+
+        <!-- Online Kullanıcılar -->
+        <div id="online-container">
+            <h2>Online Kullanıcılar</h2>
+            <ul id="online-users"></ul>
+        </div>
+
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    </body>
+</html>

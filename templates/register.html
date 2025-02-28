@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Kayıt Ol</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+    </head>
+    <body>
+        <h2>Kayıt Ol</h2>
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}
+        <form method="POST">
+            <input
+                type="text"
+                name="username"
+                placeholder="Kullanıcı Adı"
+                required
+            />
+            <input
+                type="password"
+                name="password"
+                placeholder="Şifre"
+                required
+            />
+            <button type="submit">Kayıt Ol</button>
+        </form>
+        <p>
+            Zaten hesabınız var mı?
+            <a href="{{ url_for('login') }}">Giriş Yap</a>
+        </p>
+    </body>
+</html>

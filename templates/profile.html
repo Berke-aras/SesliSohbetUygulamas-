@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Profil Düzenle</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+    </head>
+    <body>
+        <h2>Profil Düzenle</h2>
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %} {% endwith %}
+        <form method="POST" enctype="multipart/form-data">
+            <input
+                type="text"
+                name="username"
+                placeholder="Kullanıcı Adı"
+                value="{{ user.username }}"
+                required
+            />
+            <input
+                type="password"
+                name="password"
+                placeholder="Yeni Şifre (Değiştirmek istemiyorsanız boş bırakın)"
+            />
+            <input type="file" name="profile_image" accept="image/*" />
+            <button type="submit">Güncelle</button>
+        </form>
+        <!-- Ana sayfaya dönüş butonu -->
+        <a href="{{ url_for('index') }}"><button>Ana Sayfaya Dön</button></a>
+        <p><a href="{{ url_for('logout') }}">Çıkış Yap</a></p>
+    </body>
+</html>

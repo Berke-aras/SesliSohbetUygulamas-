@@ -1,0 +1,218 @@
+/* style.css */
+:root {
+    --background: #36393f;
+    --secondary-bg: #2f3136;
+    --tertiary-bg: #202225;
+    --accent: #5865f2;
+    --text-primary: #dcddde;
+    --text-secondary: #b9bbbe;
+    --hover-effect: rgba(79, 84, 92, 0.16);
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: "Whitney", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    min-height: 100vh;
+}
+
+/* Üst Menü */
+#top-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 10px;
+    background: var(--secondary-bg);
+    border-radius: 0 0 0 8px;
+    z-index: 1000;
+}
+
+#top-menu button {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: background 0.2s;
+}
+
+#top-menu button:hover {
+    background: #4752c4;
+}
+
+/* Ana Konteynırlar */
+#chat-container,
+#voice-container,
+#online-container {
+    background: var(--secondary-bg);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+#chat-container {
+    flex: 3;
+    min-width: 400px;
+}
+
+#voice-container {
+    flex: 2;
+    min-width: 250px;
+}
+
+#online-container {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Mesajlaşma Bölümü */
+#chat-window {
+    height: 60vh;
+    overflow-y: auto;
+    background: var(--tertiary-bg);
+    border-radius: 8px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+#messages li {
+    list-style: none;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#messages img {
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+#chat-input {
+    display: flex;
+    gap: 10px;
+}
+
+#message {
+    flex: 1;
+    background: var(--tertiary-bg);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    padding: 12px;
+    color: var(--text-primary);
+    outline: none;
+}
+
+#send {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#send:hover {
+    background: #4752c4;
+}
+
+/* Sesli Sohbet */
+#device-selection {
+    margin: 15px 0;
+}
+
+#device-selection select {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    background: var(--tertiary-bg);
+    border: none;
+    border-radius: 4px;
+    color: var(--text-primary);
+}
+
+#join-voice,
+#leave-voice {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+/* Online Kullanıcılar */
+#online-users li {
+    list-style: none;
+    padding: 8px;
+    margin: 5px 0;
+    background: var(--tertiary-bg);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Form Stilleri */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="file"] {
+    padding: 12px;
+    background: var(--tertiary-bg);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+    color: var(--text-primary);
+}
+
+button[type="submit"] {
+    background: var(--accent);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Hata Mesajları */
+ul {
+    padding: 0;
+}
+
+li {
+    color: #ed4245;
+    list-style: none;
+    padding: 5px 0;
+}
+
+/* Responsive Tasarım */
+@media (max-width: 1200px) {
+    body {
+        flex-direction: column;
+    }
+
+    #chat-container,
+    #voice-container,
+    #online-container {
+        width: 100%;
+        min-width: auto;
+    }
+}
