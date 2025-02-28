@@ -41,14 +41,23 @@ let localStream;
 let peers = {};
 let room = "default";
 
+// "Onayla" butonu tıklandığında seçilen aygıtlarla ses akışını başlat
+document
+    .getElementById("confirm-devices")
+    .addEventListener("click", async () => {
+        document.getElementById("device-selection").style.display = "none"; // Menüyü gizle
+        await startVoice(); // Ses akışını başlat
+        document.getElementById("join-voice").style.display = "none";
+        document.getElementById("leave-voice").style.display = "inline";
+    });
+
+// "Ses Kanalına Katıl" butonu tıklandığında aygıt seçim menüsünü göster
 document.getElementById("join-voice").addEventListener("click", async () => {
-    document.getElementById("device-selection").style.display = "block";
-    await enumerateDevices();
-    await startVoice();
-    document.getElementById("join-voice").style.display = "none";
-    document.getElementById("leave-voice").style.display = "inline";
+    document.getElementById("device-selection").style.display = "block"; // Menüyü göster
+    await enumerateDevices(); // Aygıtları listele
 });
 
+// Ses kanalından ayrılma
 document.getElementById("leave-voice").addEventListener("click", () => {
     socket.emit("leave_voice", { room: room });
     document
@@ -60,6 +69,7 @@ document.getElementById("leave-voice").addEventListener("click", () => {
     document.getElementById("join-voice").style.display = "inline";
 });
 
+// Aygıtları listeleme fonksiyonu
 async function enumerateDevices() {
     const devices = await navigator.mediaDevices.enumerateDevices();
     const inputSelect = document.getElementById("input-device");
@@ -79,32 +89,57 @@ async function enumerateDevices() {
 }
 
 async function startVoice() {
+    // Giriş ve çıkış cihazlarını seçen HTML elemanlarını al
     const inputSelect = document.getElementById("input-device");
+    const outputSelect = document.getElementById("output-device");
+
+    // Mikrofon (giriş) için ayarlar
     const constraints = {
         audio: {
             deviceId: inputSelect.value
                 ? { exact: inputSelect.value }
                 : undefined,
+            echoCancellation: true, // Yankı engelleme
+            noiseSuppression: true, // Gürültü engelleme
+            autoGainControl: true, // Otomatik kazanç kontrolü
         },
     };
+
+    // Mikrofon akışını başlat
     try {
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
     } catch (e) {
         console.error("Ses akışı alınamadı:", e);
+        document.getElementById("voice-status").innerText =
+            "Ses akışı başlatılamadı.";
         return;
     }
+
+    // Ses kanalına katıldığınızı bildir
     document.getElementById("voice-status").innerText =
         "Ses kanalına katıldınız.";
     socket.emit("join_voice", { room: room });
 
+    // Çıkış cihazını (hoparlör) ayarla
+    const audioElements = document.querySelectorAll("audio");
+    if (outputSelect.value) {
+        audioElements.forEach((audio) => {
+            audio.setSinkId(outputSelect.value).catch((e) => {
+                console.error("Çıkış cihazı ayarlanamadı:", e);
+            });
+        });
+    }
+
+    // Kullanıcı katıldığında peer bağlantısı kur
     socket.on("user_joined", (data) => {
         let peerId = data.socketId;
-        if (peerId === socket.id) return;
+        if (peerId === socket.id) return; // Kendi ID'nizi kontrol edin
         if (!peers[peerId]) {
             createPeerConnection(peerId, true);
         }
     });
 
+    // Sinyal olaylarını işle
     socket.on("signal", async (data) => {
         let peerId = data.from;
         if (!peers[peerId]) {
@@ -158,6 +193,17 @@ function createPeerConnection(peerId, isOfferer) {
             remoteAudio.id = "audio-" + peerId;
             remoteAudio.autoplay = true;
             document.getElementById("voice-status").appendChild(remoteAudio);
+
+            // Ses kontrolü ekle
+            let volumeControl = document.createElement("input");
+            volumeControl.type = "range";
+            volumeControl.min = 0;
+            volumeControl.max = 100;
+            volumeControl.value = 100;
+            volumeControl.addEventListener("input", () => {
+                remoteAudio.volume = volumeControl.value / 100;
+            });
+            document.getElementById("voice-status").appendChild(volumeControl);
         }
         remoteAudio.srcObject = event.streams[0];
     };
@@ -193,4 +239,41 @@ socket.on("voice_users", (users) => {
         }
         voiceList.appendChild(li);
     });
+});
+
+let isMuted = false;
+document.getElementById("mute").addEventListener("click", () => {
+    if (!localStream) return; // Ses akışı yoksa işlem yapma
+    isMuted = !isMuted;
+    localStream.getAudioTracks().forEach((track) => {
+        track.enabled = !isMuted;
+    });
+    document.getElementById("mute").innerText = isMuted
+        ? "Susturmayı Aç"
+        : "Sustur";
+});
+
+// Elemanları al
+const requestPermissionBtn = document.getElementById("request-permission");
+const permissionContainer = document.getElementById("permission-container");
+const voiceContainer = document.getElementById("voice-container");
+
+// Butona tıklama olayı
+requestPermissionBtn.addEventListener("click", async () => {
+    try {
+        // Mikrofon iznini iste
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true,
+        });
+
+        // İzin verildiyse, izin ekranını gizle ve sesli sohbet ekranını göster
+        permissionContainer.style.display = "none";
+        voiceContainer.style.display = "block";
+
+        // Bu stream yalnızca izin almak için kullanıldı, durduruyoruz
+        stream.getTracks().forEach((track) => track.stop());
+    } catch (error) {
+        console.error("Mikrofon izni alınamadı:", error);
+        alert("Mikrofon izni verilmedi. Sesli sohbete katılamazsınız.");
+    }
 });

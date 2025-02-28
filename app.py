@@ -33,6 +33,7 @@ class Message(db.Model):
     username = db.Column(db.String(80), nullable=False)
     text = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    profile_image_url = db.Column(db.String(200), default='')  # Yeni alan
 
 # Global kullanıcı takipleri
 online_users = {}   # { socket_id: { 'username': ..., 'profile_image_url': ... } }
@@ -152,21 +153,26 @@ def on_disconnect():
 def handle_message(data):
     user_id = session.get('user_id')
     username = session.get('username')
+    profile_image_url = session.get('profile_image_url')  # Profil URL'sini al
     msg_text = data.get('message')
-    msg = Message(user_id=user_id, username=username, text=msg_text)
+    msg = Message(user_id=user_id, username=username, text=msg_text, profile_image_url=profile_image_url)
     db.session.add(msg)
     db.session.commit()
     emit('receive_message', {
         'username': username,
         'message': msg_text,
-        'profile_image_url': session.get('profile_image_url')
+        'profile_image_url': profile_image_url
     }, broadcast=True)
 
 @socketio.on('join_voice')
 def handle_join_voice(data):
     room = data.get('room', 'default')
     join_room(room)
-    user_info = {'socketId': request.sid, 'username': session.get('username')}
+    user_info = {
+        'socketId': request.sid,
+        'username': session.get('username'),
+        'profile_image_url': session.get('profile_image_url')  # Profil URL'sini ekle
+    }
     voice_users[request.sid] = user_info
     emit('voice_users', list(voice_users.values()), broadcast=True)
     emit('user_joined', user_info, room=room)
