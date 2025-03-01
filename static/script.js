@@ -99,9 +99,10 @@ async function startVoice() {
             deviceId: inputSelect.value
                 ? { exact: inputSelect.value }
                 : undefined,
-            echoCancellation: true, // Yankı engelleme
-            noiseSuppression: true, // Gürültü engelleme
-            autoGainControl: true, // Otomatik kazanç kontrolü
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+            sampleRate: 48000,
         },
     };
 
@@ -172,8 +173,21 @@ function createPeerConnection(peerId, isOfferer) {
     const pc = new RTCPeerConnection({
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
-    peers[peerId] = pc;
-    localStream.getTracks().forEach((track) => pc.addTrack(track, localStream));
+    pc.onnegotiationneeded = async () => {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        const sdp = pc.localDescription.sdp.replace(
+            "opus/48000",
+            "opus/48000; maxaveragebitrate=128000"
+        );
+        await pc.setLocalDescription({ type: "offer", sdp: sdp });
+        socket.emit("signal", {
+            room: room,
+            sdp: pc.localDescription,
+            to: peerId,
+            from: socket.id,
+        });
+    };
 
     pc.onicecandidate = (event) => {
         if (event.candidate) {
@@ -277,3 +291,18 @@ requestPermissionBtn.addEventListener("click", async () => {
         alert("Mikrofon izni verilmedi. Sesli sohbete katılamazsınız.");
     }
 });
+
+async function startVoiceWithCustomEcho() {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaStreamSource(stream);
+    const destination = audioContext.createMediaStreamDestination();
+
+    // Özel bir yankı engelleme filtresi ekleyebilirsiniz (örneğin, gain ile)
+    const gainNode = audioContext.createGain();
+    gainNode.gain.value = 0.8; // Ses seviyesini ayarlama
+    source.connect(gainNode).connect(destination);
+
+    localStream = destination.stream; // İşlenmiş akışı kullan
+    socket.emit("join_voice", { room: room });
+}

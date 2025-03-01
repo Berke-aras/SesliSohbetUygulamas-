@@ -33,7 +33,7 @@ class Message(db.Model):
     username = db.Column(db.String(80), nullable=False)
     text = db.Column(db.Text, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    profile_image_url = db.Column(db.String(200), default='')  # Yeni alan
+    profile_image_url = db.Column(db.String(200), default='')
 
 # Global kullanıcı takipleri
 online_users = {}   # { socket_id: { 'username': ..., 'profile_image_url': ... } }
@@ -46,9 +46,9 @@ voice_users = {}    # { socket_id: { 'socketId': ..., 'username': ... } }
 
 @app.route('/')
 def index():
-    if 'user_id' not in session:
+    if 'user_id' not in session:  # Kullanıcı giriş yapmamışsa login sayfasına yönlendir
         return redirect(url_for('login'))
-    messages = Message.query.order_by(Message.timestamp.asc()).all()
+    messages = db.session.query(Message.username, Message.text, Message.profile_image_url).order_by(Message.timestamp.asc()).all()
     return render_template('index.html', messages=messages)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -126,8 +126,9 @@ def upload():
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
+    response = send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+    response.headers['Cache-Control'] = 'public, max-age=86400'  # 1 gün önbellek
+    return response
 # -----------------
 # Socket.IO Olayları
 # -----------------
