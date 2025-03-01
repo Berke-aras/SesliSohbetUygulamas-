@@ -1,5 +1,5 @@
 const socket = io();
-
+let remoteUserInfo = {};
 // Mesaj gönderme
 document.getElementById("send").addEventListener("click", () => {
     let message = document.getElementById("message").value;
@@ -131,10 +131,22 @@ async function startVoice() {
         });
     }
 
-    // Kullanıcı katıldığında peer bağlantısı kur
     socket.on("user_joined", (data) => {
         let peerId = data.socketId;
-        if (peerId === socket.id) return; // Kendi ID'nizi kontrol edin
+        // Kullanıcı bilgilerini global nesneye ekleyin
+        remoteUserInfo[peerId] = data;
+        if (peerId === socket.id) return; // Kendi bağlantınızı atlayın
+
+        // Eğer audio container önceden oluşturulmuşsa label'ı güncelleyin
+        let container = document.getElementById("audio-container-" + peerId);
+        if (container) {
+            let label = container.querySelector(".user-label");
+            if (label) {
+                label.innerText =
+                    "Kullanıcı: " + (data.username || "Kullanıcı " + peerId);
+            }
+        }
+
         if (!peers[peerId]) {
             createPeerConnection(peerId, true);
         }
@@ -167,27 +179,22 @@ async function startVoice() {
             }
         }
     });
+
+    console.log("Local stream obtained:", localStream);
 }
 
 function createPeerConnection(peerId, isOfferer) {
     const pc = new RTCPeerConnection({
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
-    pc.onnegotiationneeded = async () => {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        const sdp = pc.localDescription.sdp.replace(
-            "opus/48000",
-            "opus/48000; maxaveragebitrate=128000"
-        );
-        await pc.setLocalDescription({ type: "offer", sdp: sdp });
-        socket.emit("signal", {
-            room: room,
-            sdp: pc.localDescription,
-            to: peerId,
-            from: socket.id,
+
+    peers[peerId] = pc;
+
+    if (localStream) {
+        localStream.getTracks().forEach((track) => {
+            pc.addTrack(track, localStream);
         });
-    };
+    }
 
     pc.onicecandidate = (event) => {
         if (event.candidate) {
@@ -201,25 +208,51 @@ function createPeerConnection(peerId, isOfferer) {
     };
 
     pc.ontrack = (event) => {
-        let remoteAudio = document.getElementById("audio-" + peerId);
-        if (!remoteAudio) {
-            remoteAudio = document.createElement("audio");
-            remoteAudio.id = "audio-" + peerId;
-            remoteAudio.autoplay = true;
-            document.getElementById("voice-status").appendChild(remoteAudio);
+        console.log("Received remote stream:", event.streams[0]);
+        let container = document.getElementById("audio-container-" + peerId);
+        let audioElement;
 
-            // Ses kontrolü ekle
-            let volumeControl = document.createElement("input");
-            volumeControl.type = "range";
-            volumeControl.min = 0;
-            volumeControl.max = 100;
-            volumeControl.value = 100;
-            volumeControl.addEventListener("input", () => {
-                remoteAudio.volume = volumeControl.value / 100;
+        if (!container) {
+            container = document.createElement("div");
+            container.id = "audio-container-" + peerId;
+            container.classList.add("audio-container");
+
+            // Kullanıcı adını al, eğer yoksa peerId'yi kullan
+            const label = document.createElement("span");
+            let username =
+                remoteUserInfo[peerId] && remoteUserInfo[peerId].username
+                    ? remoteUserInfo[peerId].username
+                    : "Kullanıcı " + peerId;
+            label.innerText = "Kullanıcı: " + username;
+            label.innerText = "Kullanıcı: " + username;
+            label.classList.add("user-label");
+            container.appendChild(label);
+
+            // Remote ses elementi
+            audioElement = document.createElement("audio");
+            audioElement.id = "audio-" + peerId;
+            audioElement.autoplay = true;
+            container.appendChild(audioElement);
+
+            // Kişiye özel ses seviyesi kontrolü (slider)
+            const volumeSlider = document.createElement("input");
+            volumeSlider.type = "range";
+            volumeSlider.min = 0;
+            volumeSlider.max = 100;
+            volumeSlider.value = 100;
+            volumeSlider.classList.add("volume-slider");
+            volumeSlider.addEventListener("input", () => {
+                audioElement.volume = volumeSlider.value / 100;
             });
-            document.getElementById("voice-status").appendChild(volumeControl);
+            container.appendChild(volumeSlider);
+
+            // Konteyneri, sesli sohbet kullanıcılarının listelendiği bölüme ekleyin
+            document.getElementById("voice-users").appendChild(container);
+        } else {
+            audioElement = document.getElementById("audio-" + peerId);
         }
-        remoteAudio.srcObject = event.streams[0];
+        // Remote stream’i ses elementine ata
+        audioElement.srcObject = event.streams[0];
     };
 
     if (isOfferer) {
