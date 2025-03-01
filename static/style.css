@@ -1,90 +1,94 @@
-/* style.css */
-:root {
-    --background: #36393f;
-    --secondary-bg: #2f3136;
-    --tertiary-bg: #202225;
-    --accent: #5865f2;
-    --text-primary: #dcddde;
-    --text-secondary: #b9bbbe;
-    --hover-effect: rgba(79, 84, 92, 0.16);
+/* Genel Stiller */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Arial", sans-serif;
 }
 
 body {
-    background-color: var(--background);
-    color: var(--text-primary);
-    font-family: "Whitney", "Helvetica Neue", Helvetica, Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    display: flex;
-    gap: 20px;
+    background-color: #36393f;
+    color: #dcddde;
     min-height: 100vh;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
+    gap: 20px;
 }
 
 /* Üst Menü */
 #top-menu {
     position: fixed;
-    top: 0;
-    right: 0;
-    padding: 10px;
-    background: var(--secondary-bg);
-    border-radius: 0 0 0 8px;
+    top: 10px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
     z-index: 1000;
 }
 
 #top-menu button {
-    background: var(--accent);
-    color: white;
+    background: #2f3136;
     border: none;
+    color: #b9bbbe;
     padding: 8px 16px;
     border-radius: 4px;
     cursor: pointer;
-    margin-left: 8px;
     transition: background 0.2s;
 }
 
 #top-menu button:hover {
-    background: #4752c4;
+    background: #40444b;
 }
 
-/* Ana Konteynırlar */
-#chat-container,
-#voice-container,
-#online-container {
-    background: var(--secondary-bg);
+/* İzin Container */
+#permission-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #2f3136;
+    padding: 30px;
     border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    z-index: 999;
 }
 
-#chat-container {
-    flex: 3;
-    min-width: 400px;
-}
-
-#voice-container {
-    flex: 2;
-    min-width: 250px;
-}
-
-#online-container {
-    flex: 1;
-    min-width: 200px;
+#permission-container button {
+    background: #5865f2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    margin-top: 15px;
+    cursor: pointer;
 }
 
 /* Mesajlaşma Bölümü */
-#chat-window {
-    height: 60vh;
-    overflow-y: auto;
-    background: var(--tertiary-bg);
+#chat-container {
+    flex: 2;
+    background: #2f3136;
     border-radius: 8px;
-    padding: 15px;
+    padding: 20px;
+    min-width: 300px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#chat-window {
+    flex: 1;
+    overflow-y: auto;
     margin: 15px 0;
+    padding-right: 10px;
 }
 
 #messages li {
     list-style: none;
-    padding: 8px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 10px;
+    margin: 8px 0;
+    background: #40444b;
+    border-radius: 5px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -92,7 +96,6 @@ body {
 
 #messages img {
     border-radius: 50%;
-    object-fit: cover;
 }
 
 #chat-input {
@@ -102,117 +105,127 @@ body {
 
 #message {
     flex: 1;
-    background: var(--tertiary-bg);
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
     padding: 12px;
-    color: var(--text-primary);
-    outline: none;
+    background: #40444b;
+    border: none;
+    border-radius: 4px;
+    color: white;
 }
 
 #send {
-    background: var(--accent);
+    background: #5865f2;
     color: white;
     border: none;
-    padding: 12px 24px;
+    padding: 12px 20px;
     border-radius: 4px;
     cursor: pointer;
-    transition: background 0.2s;
 }
 
-#send:hover {
+/* Sesli Sohbet Bölümü */
+#voice-container {
+    flex: 1;
+    background: #2f3136;
+    border-radius: 8px;
+    padding: 20px;
+    min-width: 250px;
+    max-height: 80vh;
+}
+
+#voice-container button {
+    background: #5865f2;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#voice-container button:hover {
     background: #4752c4;
 }
 
-/* Sesli Sohbet */
 #device-selection {
     margin: 15px 0;
 }
 
-#device-selection select {
-    width: 100%;
-    padding: 8px;
-    margin: 5px 0;
-    background: var(--tertiary-bg);
-    border: none;
-    border-radius: 4px;
-    color: var(--text-primary);
-}
-
-#join-voice,
-#leave-voice {
-    width: 100%;
-    padding: 12px;
-    margin: 10px 0;
-    background: var(--accent);
+select {
+    background: #40444b;
     color: white;
     border: none;
+    padding: 8px;
+    margin: 5px 0;
     border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s;
+    width: 100%;
 }
 
 /* Online Kullanıcılar */
-#online-users li {
+#online-container {
+    background: #2f3136;
+    border-radius: 8px;
+    padding: 20px;
+    min-width: 200px;
+    max-height: 80vh;
+}
+
+#online-users li,
+#voice-users li {
     list-style: none;
     padding: 8px;
     margin: 5px 0;
-    background: var(--tertiary-bg);
+    background: #40444b;
     border-radius: 4px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
 }
 
-/* Form Stilleri */
-form {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    max-width: 400px;
-    margin: 20px auto;
+/* Giriş/Kayıt/Profil Sayfaları */
+body > form {
+    background: #2f3136;
+    padding: 30px;
+    border-radius: 8px;
+    width: 400px;
+    margin: 50px auto;
+    text-align: center;
 }
 
 input[type="text"],
 input[type="password"],
 input[type="file"] {
+    width: 100%;
     padding: 12px;
-    background: var(--tertiary-bg);
-    border: 1px solid rgba(0, 0, 0, 0.3);
+    margin: 10px 0;
+    background: #40444b;
+    border: none;
     border-radius: 4px;
-    color: var(--text-primary);
+    color: white;
 }
 
 button[type="submit"] {
-    background: var(--accent);
+    background: #5865f2;
     color: white;
-    padding: 12px;
     border: none;
+    padding: 12px 20px;
+    margin-top: 15px;
     border-radius: 4px;
     cursor: pointer;
+    width: 100%;
 }
 
-/* Hata Mesajları */
-ul {
-    padding: 0;
-}
-
-li {
-    color: #ed4245;
-    list-style: none;
-    padding: 5px 0;
+a {
+    color: #00aff4;
+    text-decoration: none;
 }
 
 /* Responsive Tasarım */
-@media (max-width: 1200px) {
+@media (max-width: 768px) {
     body {
         flex-direction: column;
+        padding: 10px;
     }
 
     #chat-container,
     #voice-container,
     #online-container {
+        max-height: none;
         width: 100%;
-        min-width: auto;
     }
 }
