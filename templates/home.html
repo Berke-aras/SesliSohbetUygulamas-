@@ -28,33 +28,26 @@
             {% endfor %}
         </div>
         {% endif %} {% endwith %}
-
-        <div
-            style="
-                display: flex;
-                flex-direction: column;
-                gap: 15px;
-                align-items: start;
-            "
-        >
-            <h1>Hoşgeldiniz, {{ session.username }}!</h1>
-
+        <h1>Hoşgeldiniz, {{ session.username }}!</h1>
+        <div style="display: flex; flex-direction: column">
             <h2>Sunucuya Katıl</h2>
-            <form method="POST" action="/join_server">
+            <!-- Giriş/Kayıt/Profil sayfaları için formlar, ortak stil dosyasıyla uyumlu -->
+            <form id="join-form">
                 <input
                     type="text"
                     name="invite_code"
                     placeholder="Davet Kodu"
                     required
                 />
-                <button type="submit">Sunucuya Katıl</button>
+                <button type="button" id="join-server-button">
+                    Sunucuya Katıl
+                </button>
             </form>
         </div>
         <div style="display: flex; flex-direction: column">
             <h2>Üye Olduğunuz Sunucular</h2>
             <ul>
                 {% for server in servers %}
-                <!-- home.html içindeki sunucu listesi kısmını güncelleyin -->
                 <li class="server-item">
                     <a
                         href="{{ url_for('server_chat', invite_code=server.invite_code) }}"
@@ -68,7 +61,7 @@
                     >
                         {{ server.invite_code }}
                     </span>
-                    <!-- Çık butonu ekleyin -->
+                    <!-- Çık butonu -->
                     <form
                         action="{{ url_for('leave_server', invite_code=server.invite_code) }}"
                         method="POST"
@@ -86,6 +79,27 @@
                             Çık
                         </button>
                     </form>
+
+                    <!-- Sil butonu (sadece sahip görsün) -->
+                    {% if server.owner_id == session.user_id %}
+                    <form
+                        action="{{ url_for('delete_server', invite_code=server.invite_code) }}"
+                        method="POST"
+                        style="display: inline"
+                    >
+                        <button
+                            type="submit"
+                            onclick="return confirm('Bu sunucuyu silmek istediğinize emin misiniz?')"
+                            style="
+                                margin-left: 10px;
+                                background-color: #ff0000;
+                                color: white;
+                            "
+                        >
+                            Sil
+                        </button>
+                    </form>
+                    {% endif %}
                 </li>
                 {% endfor %}
             </ul>

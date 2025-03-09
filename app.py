@@ -20,8 +20,8 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 
 # Çoktan çoğa ilişki: Sunucu üyeleri
 server_members = db.Table('server_members',
-    db.Column('server_id', db.Integer, db.ForeignKey('server.id'), primary_key=True),
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    db.Column('server_id', db.Integer, db.ForeignKey('server.id', ondelete='CASCADE'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), primary_key=True)
 )
 
 # -----------------
@@ -36,10 +36,10 @@ class User(db.Model):
 class Server(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
-    invite_code = db.Column(db.String(64), unique=True, nullable=False)  # Rastgele oluşturulan benzersiz kod
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    invite_code = db.Column(db.String(64), unique=True, nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id', ondelete='CASCADE'), nullable=False)  # ForeignKey ekleyin
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
-    members = db.relationship('User', secondary=server_members, backref='servers')
+    members = db.relationship('User', secondary=server_members, backref=db.backref('servers', lazy='dynamic'))  # backref düzeltmesi
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -310,15 +310,21 @@ def leave_server(invite_code):
     if not server:
         flash("Sunucu bulunamadı!")
         return redirect(url_for('home'))
+    
     user = User.query.get(session['user_id'])
-    if user in server.members:
-        if server.owner_id == user.id:
-            flash("Sunucunun sahibi olduğunuz için çıkamazsınız. Sunucuyu silmek için aşağıdaki butonu kullanın.")
-            return redirect(url_for('server_chat', invite_code=invite_code))
-        else:
-            server.members.remove(user)
-            db.session.commit()
-            flash("Sunucudan ayrıldınız.")
+    
+    if user not in server.members:
+        flash("Zaten bu sunucuda değilsiniz.")
+        return redirect(url_for('server_chat', invite_code=invite_code))
+    
+    # Sunucu sahibi kontrolü
+    if server.owner_id == user.id:
+        flash("Sunucu sahibi sunucudan çıkamaz. Lütfen sunucuyu silin.")
+        return redirect(url_for('server_chat', invite_code=invite_code))
+    
+    server.members.remove(user)
+    db.session.commit()
+    flash("Sunucudan ayrıldınız.")
     return redirect(url_for('home'))
 
 # Sunucu silme rotası (sadece sunucu sahibi silebilir)
@@ -330,10 +336,16 @@ def delete_server(invite_code):
     if not server:
         flash("Sunucu bulunamadı!")
         return redirect(url_for('home'))
+    
     user = User.query.get(session['user_id'])
+    
     if server.owner_id != user.id:
-        flash("Yalnızca sunucu sahibi sunucuyu silebilir.")
+        flash("Yalnızca sunucu sahibi silebilir.")
         return redirect(url_for('server_chat', invite_code=invite_code))
+    
+    # İlişkili mesajları sil
+    Message.query.filter_by(server_id=server.id).delete()
+    # Sunucuyu sil
     db.session.delete(server)
     db.session.commit()
     flash("Sunucu silindi.")
