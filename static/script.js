@@ -1,5 +1,6 @@
 const socket = io();
 let remoteUserInfo = {};
+
 // Mesaj gönderme
 document.getElementById("send").addEventListener("click", () => {
     let message = document.getElementById("message").value;
@@ -88,6 +89,56 @@ async function enumerateDevices() {
     });
 }
 
+// Yeni: Ses efektlerini uygulayan fonksiyon
+function applyAudioEffects(stream) {
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaStreamSource(stream);
+
+    // Slider değerlerini oku
+    const bassGainValue = parseFloat(
+        document.getElementById("bass-gain").value
+    );
+    const noiseThresholdValue = parseFloat(
+        document.getElementById("noise-threshold").value
+    );
+
+    // Bass Boost filtresi
+    const bassFilter = audioContext.createBiquadFilter();
+    bassFilter.type = "lowshelf";
+    bassFilter.frequency.value = 150; // 150 Hz civarı
+    bassFilter.gain.value = bassGainValue; // Slider değeri
+
+    // Noise Gate işlemi için ScriptProcessorNode
+    const processor = audioContext.createScriptProcessor(2048, 1, 1);
+    processor.onaudioprocess = (event) => {
+        const input = event.inputBuffer.getChannelData(0);
+        const output = event.outputBuffer.getChannelData(0);
+        let sum = 0;
+        for (let i = 0; i < input.length; i++) {
+            sum += input[i] * input[i];
+        }
+        const rms = Math.sqrt(sum / input.length);
+        if (rms < noiseThresholdValue) {
+            for (let i = 0; i < input.length; i++) {
+                output[i] = 0;
+            }
+        } else {
+            for (let i = 0; i < input.length; i++) {
+                output[i] = input[i];
+            }
+        }
+    };
+
+    const destination = audioContext.createMediaStreamDestination();
+
+    // Ses zinciri: source -> bassFilter -> processor -> destination
+    source.connect(bassFilter);
+    bassFilter.connect(processor);
+    processor.connect(destination);
+
+    return destination.stream;
+}
+
 async function startVoice() {
     // Giriş ve çıkış cihazlarını seçen HTML elemanlarını al
     const inputSelect = document.getElementById("input-device");
@@ -109,6 +160,8 @@ async function startVoice() {
     // Mikrofon akışını başlat
     try {
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        // Yeni eklenen efektler: Dip ses egelleyici ve gürültü kesici
+        localStream = applyAudioEffects(localStream);
     } catch (e) {
         console.error("Ses akışı alınamadı:", e);
         document.getElementById("voice-status").innerText =
@@ -224,7 +277,6 @@ function createPeerConnection(peerId, isOfferer) {
                     ? remoteUserInfo[peerId].username
                     : "Kullanıcı " + peerId;
             label.innerText = "Kullanıcı: " + username;
-            label.innerText = "Kullanıcı: " + username;
             label.classList.add("user-label");
             container.appendChild(label);
 
@@ -253,6 +305,10 @@ function createPeerConnection(peerId, isOfferer) {
         }
         // Remote stream’i ses elementine ata
         audioElement.srcObject = event.streams[0];
+        let profileImgElement = container.querySelector("img");
+        if (profileImgElement) {
+            monitorAudio(audioElement, profileImgElement);
+        }
     };
 
     if (isOfferer) {
@@ -339,3 +395,54 @@ async function startVoiceWithCustomEcho() {
     localStream = destination.stream; // İşlenmiş akışı kullan
     socket.emit("join_voice", { room: room });
 }
+
+function monitorAudio(audioElement, profileImgElement) {
+    const audioContext = new AudioContext();
+    const source = audioContext.createMediaElementSource(audioElement);
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    source.connect(analyser);
+    analyser.connect(audioContext.destination);
+
+    const dataArray = new Uint8Array(analyser.fftSize);
+    setInterval(() => {
+        analyser.getByteTimeDomainData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+            let sample = dataArray[i] / 128 - 1;
+            sum += sample * sample;
+        }
+        let rms = Math.sqrt(sum / dataArray.length);
+        // Eşik değeri: (örneğin 0.1) üzerinde konuşma tespiti
+        if (rms > 0.1) {
+            profileImgElement.classList.add("speaking");
+        } else {
+            profileImgElement.classList.remove("speaking");
+        }
+    }, 100); // Her 100ms de kontrol ediliyor
+}
+
+document
+    .getElementById("apply-audio-settings")
+    .addEventListener("click", () => {
+        if (localStream) {
+            // Yeni efektleri uygulamak için mevcut akışı yeniden işleyin
+            localStream = applyAudioEffects(localStream);
+            alert("Yeni ses ayarları uygulandı!");
+        }
+    });
+
+document
+    .getElementById("audio-settings-toggle")
+    .addEventListener("click", function () {
+        var content = document.getElementById("audio-settings-content");
+        content.classList.toggle("collapsed");
+
+        // İkonu değiştirme
+        var icon = document.getElementById("toggle-icon");
+        if (content.classList.contains("collapsed")) {
+            icon.textContent = "►"; // Kapalı durum ikonu
+        } else {
+            icon.textContent = "▼"; // Açık durum ikonu
+        }
+    });

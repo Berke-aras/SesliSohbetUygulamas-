@@ -1,14 +1,31 @@
+/* CSS: Geliştirilmiş Chat Uygulaması Stilleri */
+
+/* Custom Properties: Renk, boyut ve geçiş ayarları */
+:root {
+    --primary-bg: #36393f;
+    --secondary-bg: #2f3136;
+    --accent-bg: #40444b;
+    --primary-color: #dcddde;
+    --secondary-color: #b9bbbe;
+    --blue: #5865f2;
+    --blue-hover: #4752c4;
+    --link-color: #00aff4;
+    --border-radius: 4px;
+    --padding: 12px;
+    --transition: background 0.2s ease;
+}
+
 /* Genel Stiller */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Arial", sans-serif;
+    font-family: Arial, sans-serif;
 }
 
 body {
-    background-color: #36393f;
-    color: #dcddde;
+    background-color: var(--primary-bg);
+    color: var(--primary-color);
     min-height: 100vh;
     display: flex;
     flex-wrap: wrap;
@@ -27,17 +44,17 @@ body {
 }
 
 #top-menu button {
-    background: #2f3136;
+    background: var(--secondary-bg);
     border: none;
-    color: #b9bbbe;
+    color: var(--secondary-color);
     padding: 8px 16px;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     cursor: pointer;
-    transition: background 0.2s;
+    transition: var(--transition);
 }
 
 #top-menu button:hover {
-    background: #40444b;
+    background: var(--accent-bg);
 }
 
 /* İzin Container */
@@ -46,7 +63,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #2f3136;
+    background: var(--secondary-bg);
     padding: 30px;
     border-radius: 8px;
     text-align: center;
@@ -55,11 +72,11 @@ body {
 }
 
 #permission-container button {
-    background: #5865f2;
-    color: white;
+    background: var(--blue);
+    color: #fff;
     border: none;
     padding: 10px 20px;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     margin-top: 15px;
     cursor: pointer;
 }
@@ -67,7 +84,7 @@ body {
 /* Mesajlaşma Bölümü */
 #chat-container {
     flex: 2;
-    background: #2f3136;
+    background: var(--secondary-bg);
     border-radius: 8px;
     padding: 20px;
     min-width: 300px;
@@ -87,7 +104,7 @@ body {
     list-style: none;
     padding: 10px;
     margin: 8px 0;
-    background: #40444b;
+    background: var(--accent-bg);
     border-radius: 5px;
     display: flex;
     align-items: center;
@@ -106,25 +123,25 @@ body {
 #message {
     flex: 1;
     padding: 12px;
-    background: #40444b;
+    background: var(--accent-bg);
     border: none;
-    border-radius: 4px;
-    color: white;
+    border-radius: var(--border-radius);
+    color: #fff;
 }
 
 #send {
-    background: #5865f2;
-    color: white;
+    background: var(--blue);
+    color: #fff;
     border: none;
     padding: 12px 20px;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     cursor: pointer;
 }
 
 /* Sesli Sohbet Bölümü */
 #voice-container {
     flex: 1;
-    background: #2f3136;
+    background: var(--secondary-bg);
     border-radius: 8px;
     padding: 20px;
     min-width: 250px;
@@ -132,17 +149,18 @@ body {
 }
 
 #voice-container button {
-    background: #5865f2;
-    color: white;
+    background: var(--blue);
+    color: #fff;
     border: none;
     padding: 10px 15px;
     margin: 5px;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     cursor: pointer;
+    transition: var(--transition);
 }
 
 #voice-container button:hover {
-    background: #4752c4;
+    background: var(--blue-hover);
 }
 
 #device-selection {
@@ -150,18 +168,18 @@ body {
 }
 
 select {
-    background: #40444b;
-    color: white;
+    background: var(--accent-bg);
+    color: #fff;
     border: none;
     padding: 8px;
     margin: 5px 0;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     width: 100%;
 }
 
 /* Online Kullanıcılar */
 #online-container {
-    background: #2f3136;
+    background: var(--secondary-bg);
     border-radius: 8px;
     padding: 20px;
     min-width: 200px;
@@ -173,13 +191,14 @@ select {
     list-style: none;
     padding: 8px;
     margin: 5px 0;
-    background: #40444b;
-    border-radius: 4px;
+    background: var(--accent-bg);
+    border-radius: var(--border-radius);
+    margin-top: 30px;
 }
 
 /* Giriş/Kayıt/Profil Sayfaları */
 body > form {
-    background: #2f3136;
+    background: var(--secondary-bg);
     padding: 30px;
     border-radius: 8px;
     width: 400px;
@@ -191,28 +210,146 @@ input[type="text"],
 input[type="password"],
 input[type="file"] {
     width: 100%;
-    padding: 12px;
+    padding: var(--padding);
     margin: 10px 0;
-    background: #40444b;
+    background: var(--accent-bg);
     border: none;
-    border-radius: 4px;
-    color: white;
+    border-radius: var(--border-radius);
+    color: #fff;
 }
 
 button[type="submit"] {
-    background: #5865f2;
-    color: white;
+    background: var(--blue);
+    color: #fff;
     border: none;
     padding: 12px 20px;
     margin-top: 15px;
-    border-radius: 4px;
+    border-radius: var(--border-radius);
     cursor: pointer;
     width: 100%;
 }
 
 a {
-    color: #00aff4;
+    color: var(--link-color);
     text-decoration: none;
+}
+
+.speaking {
+    border: 2px solid green;
+    border-radius: 50%;
+}
+
+--- Ses Efekt Ayarları Bölümü --- #audio-settings {
+    margin-top: 20px;
+    padding: 10px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--accent-bg);
+    border-radius: var(--border-radius);
+}
+
+#audio-settings h3 {
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+#audio-settings label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+
+#audio-settings input[type="range"] {
+    width: 100%;
+    margin: 5px 0;
+}
+
+#audio-settings span {
+    display: inline-block;
+    min-width: 30px;
+    text-align: right;
+    color: var(--primary-color);
+}
+
+#apply-audio-settings {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    margin-top: 10px;
+    transition: var(--transition);
+}
+
+#apply-audio-settings:hover {
+    background: var(--blue-hover);
+}
+
+/* --- Ses Efekt Ayarları Collapsible Bölümü --- */
+#audio-settings {
+    margin-top: 20px;
+    background: var(--secondary-bg);
+    border: 1px solid var(--accent-bg);
+    border-radius: var(--border-radius);
+    padding: 10px;
+}
+
+.collapsible-header {
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+}
+
+.collapsible-content {
+    max-height: 1000px; /* İçeriğin yüksekliğine göre ayarlanabilir */
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.collapsible-content.collapsed {
+    max-height: 0;
+}
+
+/* Ses ayarları içeriği */
+#audio-settings label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+
+#audio-settings input[type="range"] {
+    width: 100%;
+    margin: 5px 0;
+}
+
+#audio-settings span {
+    display: inline-block;
+    min-width: 30px;
+    text-align: right;
+    color: var(--primary-color);
+}
+
+#apply-audio-settings {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    padding: var(--padding);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    margin-top: 10px;
+    transition: var(--transition);
+}
+
+#apply-audio-settings:hover {
+    background: var(--blue-hover);
+}
+
+/* İkon için basit stil */
+#toggle-icon {
+    font-size: 0.8em;
 }
 
 /* Responsive Tasarım */

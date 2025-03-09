@@ -63,7 +63,7 @@
                 Ses Kanalından Çık
             </button>
             <button id="mute">Sustur</button>
-            <!-- Yeni mute tuşu -->
+            <!-- Cihaz seçim menüsü -->
             <div id="device-selection" style="display: none">
                 <label for="input-device">Mikrofon Seçin:</label>
                 <select id="input-device"></select>
@@ -71,17 +71,50 @@
                 <select id="output-device"></select>
                 <button id="confirm-devices">Onayla</button>
             </div>
+
+            <!-- Yeni: Ses Efekt Ayarları -->
+            <div id="audio-settings">
+                <h3 id="audio-settings-toggle" class="collapsible-header">
+                    Ses Efekt Ayarları
+                    <span id="toggle-icon">▼</span>
+                </h3>
+                <div id="audio-settings-content" class="collapsible-content">
+                    <div>
+                        <label for="bass-gain">Bass Boost (dB):</label>
+                        <input
+                            type="range"
+                            id="bass-gain"
+                            min="0"
+                            max="12"
+                            step="0.5"
+                            value="6"
+                        />
+                        <span id="bass-gain-value"></span>
+                    </div>
+                    <div>
+                        <label for="noise-threshold">Noise Gate Eşiği:</label>
+                        <input
+                            type="range"
+                            id="noise-threshold"
+                            min="0"
+                            max="0.1"
+                            step="0.005"
+                            value="0.02"
+                        />
+                        <span id="noise-threshold-value"></span>
+                    </div>
+                    <button id="apply-audio-settings">Ayarları Uygula</button>
+                </div>
+            </div>
+
             <div id="voice-status"></div>
             <h3>Ses Kanalı Üyeleri:</h3>
             <ul id="voice-users"></ul>
         </div>
 
-        <!-- Online Kullanıcılar -->
-        <div id="online-container">
-            <h2>Online Kullanıcılar</h2>
-            <ul id="online-users"></ul>
-        </div>
-
+        <ul id="online-users">
+            Online
+        </ul>
         <script src="{{ url_for('static', filename='script.js') }}"></script>
     </body>
 </html>
