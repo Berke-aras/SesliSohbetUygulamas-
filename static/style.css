@@ -352,6 +352,104 @@ a {
     font-size: 0.8em;
 }
 
+/* Sunucularım Sayfası Stilleri */
+h1,
+h2 {
+    margin-bottom: 20px;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Katılma Formu */
+#join-form {
+    background: var(--secondary-bg);
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 400px;
+    margin: 30px auto;
+}
+
+#join-form input[type="text"] {
+    width: 100%;
+    padding: var(--padding);
+    margin-bottom: 10px;
+    background: var(--accent-bg);
+    border: none;
+    border-radius: var(--border-radius);
+    color: var(--primary-color);
+}
+
+#join-form button {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    width: 100%;
+}
+
+#join-form button:hover {
+    background: var(--blue-hover);
+}
+
+/* Sunucu Listesi */
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.server-item {
+    background: var(--accent-bg);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    margin-bottom: 15px;
+}
+
+.server-item a {
+    color: var(--primary-color);
+    font-size: 1.2em;
+    text-decoration: none;
+}
+
+.server-item a:hover {
+    color: var(--link-color);
+}
+
+/* Davet Kodu Stilleri */
+.server-code {
+    background: var(--secondary-bg);
+    padding: 8px;
+    border-radius: var(--border-radius);
+    display: inline-block;
+    font-size: 0.9em;
+    letter-spacing: 0.5px;
+    transition: var(--transition);
+}
+
+.server-code:hover {
+    filter: brightness(1.2);
+}
+
+/* Genel Düğme Stilleri (Sunucular sayfası altındaki bağlantılardaki butonlar) */
+a button {
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    margin: 10px;
+    transition: var(--transition);
+}
+
+a button:hover {
+    background: var(--blue-hover);
+}
+
 /* Responsive Tasarım */
 @media (max-width: 768px) {
     body {

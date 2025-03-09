@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Yeni Sunucu Oluştur</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+    </head>
+    <body>
+        <h1>Yeni Sunucu Oluştur</h1>
+        <!-- Giriş/Kayıt/Profil sayfaları için form stili uygulanıyor -->
+        <form method="POST">
+            <input
+                type="text"
+                name="server_name"
+                placeholder="Sunucu Adı"
+                required
+            />
+            <button type="submit">Oluştur</button>
+        </form>
+        <a href="{{ url_for('home') }}">Geri Dön</a>
+    </body>
+</html>

@@ -3,13 +3,25 @@ let remoteUserInfo = {};
 
 // Mesaj gönderme
 document.getElementById("send").addEventListener("click", () => {
-    let message = document.getElementById("message").value;
-    if (message.trim() === "") return;
-    socket.emit("send_message", { message: message });
+    let message = document.getElementById("message").value.trim();
+    if (message === "") return;
+
+    if (!server_id) {
+        console.error("HATA: server_id eksik veya geçersiz!");
+        return;
+    }
+
+    socket.emit("send_message", {
+        server_id: server_id,
+        message: message,
+    });
+
     document.getElementById("message").value = "";
 });
 
+// Sunucudan gelen mesajları dinle
 socket.on("receive_message", (data) => {
+    console.log("Yeni mesaj alındı:", data);
     addMessage(data);
 });
 
@@ -446,3 +458,25 @@ document
             icon.textContent = "▼"; // Açık durum ikonu
         }
     });
+
+document.addEventListener("DOMContentLoaded", () => {
+    // console.log("DOM yüklendi. Server ID:", server_id); // server_id kontrolü
+
+    if (server_id) {
+        // console.log("[DEBUG] join_server gönderiliyor...");
+        socket.emit("join_server", {
+            server_id: server_id, // Değer doğru mu?
+            user_id: "{{ session.user_id }}", // Ekstra veri (opsiyonel)
+        });
+    } else {
+        console.error("[HATA] server_id tanımsız!");
+    }
+});
+
+socket.on("connect_error", (err) => {
+    console.error("[HATA] Socket bağlantı hatası:", err.message);
+});
+
+socket.on("join_confirmation", (data) => {
+    console.log("[DEBUG] Sunucu katılım onayı:", data);
+});

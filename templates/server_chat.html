@@ -23,6 +23,7 @@
                 ><button>Profil Düzenle</button></a
             >
             <a href="{{ url_for('logout') }}"><button>Çıkış Yap</button></a>
+            <a href="{{ url_for('home') }}"><button>Home</button></a>
         </div>
 
         <!-- Mesajlaşma Bölümü -->
@@ -40,7 +41,7 @@
                             height="30"
                         />
                         {% endif %}
-                        <strong>{{ msg[0] }}:</strong> {{ msg[1] }}
+                        <strong>{{ msg.username }}:</strong> {{ msg.text }}
                     </li>
                     {% endfor %}
                 </ul>
@@ -117,4 +118,10 @@
         </ul>
         <script src="{{ url_for('static', filename='script.js') }}"></script>
     </body>
+    <script>
+        var server_id = {{ server.id | tojson }};
+        socket.on("connect_error", (err) => {
+            console.log("Bağlantı hatası:", err);
+        });
+    </script>
 </html>

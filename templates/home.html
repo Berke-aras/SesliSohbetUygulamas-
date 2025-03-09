@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="tr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Sunucularım</title>
+        <link
+            rel="stylesheet"
+            href="{{ url_for('static', filename='style.css') }}"
+        />
+        <style>
+            /* Davet kodu için blur efekti */
+            .blurred {
+                filter: blur(5px);
+                cursor: pointer;
+                transition: filter 0.3s;
+            }
+            .server-item {
+                margin-bottom: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Flash mesajlarını göster -->
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <div class="flash-messages">
+            {% for message in messages %}
+            <div class="flash">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+
+        <div
+            style="
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                align-items: start;
+            "
+        >
+            <h1>Hoşgeldiniz, {{ session.username }}!</h1>
+
+            <h2>Sunucuya Katıl</h2>
+            <form method="POST" action="/join_server">
+                <input
+                    type="text"
+                    name="invite_code"
+                    placeholder="Davet Kodu"
+                    required
+                />
+                <button type="submit">Sunucuya Katıl</button>
+            </form>
+        </div>
+        <div style="display: flex; flex-direction: column">
+            <h2>Üye Olduğunuz Sunucular</h2>
+            <ul>
+                {% for server in servers %}
+                <!-- home.html içindeki sunucu listesi kısmını güncelleyin -->
+                <li class="server-item">
+                    <a
+                        href="{{ url_for('server_chat', invite_code=server.invite_code) }}"
+                    >
+                        {{ server.name }}
+                    </a>
+                    <br />
+                    <span
+                        class="server-code blurred"
+                        onclick="copyInviteCode(this)"
+                    >
+                        {{ server.invite_code }}
+                    </span>
+                    <!-- Çık butonu ekleyin -->
+                    <form
+                        action="{{ url_for('leave_server', invite_code=server.invite_code) }}"
+                        method="POST"
+                        style="display: inline"
+                    >
+                        <button
+                            type="submit"
+                            onclick="return confirm('Bu sunucudan ayrılmak istediğinize emin misiniz?')"
+                            style="
+                                margin-left: 10px;
+                                background-color: #ff4444;
+                                color: white;
+                            "
+                        >
+                            Çık
+                        </button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div style="display: flex; flex-direction: column">
+            <a href="{{ url_for('create_server') }}"
+                ><button>Yeni Sunucu Oluştur</button></a
+            >
+            <a href="{{ url_for('profile') }}"
+                ><button>Profil Düzenle</button></a
+            >
+            <a href="{{ url_for('logout') }}"><button>Çıkış Yap</button></a>
+        </div>
+        <script>
+            function copyInviteCode(element) {
+                // Blur efektini kaldır
+                element.classList.remove("blurred");
+                var inviteCode = element.textContent.trim();
+                // Clipboard API ile kopyalama işlemi
+                navigator.clipboard.writeText(inviteCode).then(
+                    function () {
+                        element.textContent = inviteCode + " (kopyalandı!)";
+                        setTimeout(function () {
+                            element.classList.add("blurred");
+                            element.textContent = inviteCode;
+                        }, 2000);
+                    },
+                    function (err) {
+                        console.error("Kopyalama başarısız: ", err);
+                    }
+                );
+            }
+
+            document
+                .getElementById("join-server-button")
+                .addEventListener("click", function () {
+                    var inviteCode = document.querySelector(
+                        "#join-form input[name='invite_code']"
+                    ).value;
+                    if (inviteCode.trim() !== "") {
+                        window.location.href = "/join_server/" + inviteCode;
+                    }
+                });
+        </script>
+    </body>
+</html>
